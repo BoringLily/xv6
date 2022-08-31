@@ -1,0 +1,12 @@
+FROM ubuntu:18.04
+WORKDIR /root/
+RUN apt-get update && apt-get install -y curl
+
+ENV HOME=/home/${USER}
+ENV XV6=${HOME}/xv6
+WORKDIR ${XV6}
+
+RUN DEBIAN_FRONTEND=noninteractive && apt-get -y update && apt-get install -y && apt-get install -y apt-utils \
+&& apt-get install -y gcc && apt-get install -y make && apt-get install -y qemu && apt-get install -y gdb
+
+ENTRYPOINT ["/bin/bash"]
