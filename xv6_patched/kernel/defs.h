@@ -10,6 +10,12 @@ struct proc;
 struct spinlock;
 struct stat;
 
+// Part B global counter
+extern int      counterPartB;
+
+// System Call Table
+extern int      sysCallTracker[25];
+
 // bio.c
 void            binit(void);
 struct buf*     bread(uint, uint);

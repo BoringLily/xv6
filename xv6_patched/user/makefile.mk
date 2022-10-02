@@ -8,7 +8,9 @@ USER_PROGS := \
 	init\
 	kill\
 	ln\
-	ls\
+	TestPartA\
+	TestPartB\
+	lsct\
 	mkdir\
 	rm\
 	sh\

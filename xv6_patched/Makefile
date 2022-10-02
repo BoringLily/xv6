@@ -104,11 +104,15 @@ clean:
 run: qemu
 
 # run xv6 in qemu
-qemu: fs.img xv6.img
-	@echo Ctrl+a h for help
-	$(QEMU) -serial mon:stdio $(QEMUOPTS)
+#qemu: fs.img xv6.img
+#	@echo Ctrl+a h for help
+#	$(QEMU) -serial mon:stdio $(QEMUOPTS)
 
 # run xv6 in qemu without a display (serial only)
+qemu: fs.img xv6.img
+	@echo Ctrl+a h for help
+	$(QEMU) -nographic $(QEMUOPTS)
+
 qemu-nox: fs.img xv6.img
 	@echo Ctrl+a h for help
 	$(QEMU) -nographic $(QEMUOPTS)

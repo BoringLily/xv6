@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "sysfunc.h": "c",
+        "user.h": "c",
+        "defs.h": "c",
+        "syscall.h": "c",
+        "stat.h": "c",
+        "types.h": "c",
+        "x86.h": "c",
+        "fcntl.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Enabled"
+}
