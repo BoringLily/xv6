@@ -102,6 +102,8 @@ static int (*syscalls[])(void) = {
     [SYS_FirstPart] sys_FirstPart, // getpid() system call counter
     [SYS_SecondPart] sys_SecondPart, // total system calls
     [SYS_sct] sys_sct, // System Call Table
+    [SYS_getpinfo] sys_getpinfo,
+    [SYS_settickets] sys_settickets,
 };
 
 // Called on a syscall trap. Checks that the syscall number (passed via eax)

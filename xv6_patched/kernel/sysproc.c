@@ -5,12 +5,43 @@
 #include "mmu.h"
 #include "proc.h"
 #include "sysfunc.h"
+#include "pstat.h"
+
 
 int counterPartA = 0;
 
 int counterPartB = 0;
 
 int sysCallTracker[25];
+
+int sys_settickets(void)
+{
+  int num;
+  if(argint(0, &num) < 0)
+  {
+    return -1;
+  }
+  else
+  {
+    return settickets(num);
+  }
+}
+
+int
+sys_getpinfo(void)
+{
+  struct pstat *pTable;
+	if(argptr(0, (void *)&pTable, sizeof(*pTable)) < 0)
+  {
+		return -1;
+	}
+	if(pTable == NULL)
+  { 
+		return -1;
+	}			
+	getpinfo(pTable);	
+	return 0;
+}
 
 int sys_sct(void)
 {

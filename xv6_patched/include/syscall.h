@@ -26,5 +26,8 @@
 #define SYS_FirstPart 22
 #define SYS_SecondPart 23
 #define SYS_sct 24
+#define SYS_getpinfo 25
+#define SYS_settickets 26
+
 
 #endif // _SYSCALL_H_

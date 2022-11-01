@@ -7,7 +7,7 @@ USER_PROGS := \
 	grep\
 	init\
 	kill\
-	ln\
+	ls\
 	TestPartA\
 	TestPartB\
 	lsct\
@@ -17,6 +17,8 @@ USER_PROGS := \
 	stressfs\
 	tester\
 	usertests\
+	tickettest\
+	readingpstat\
 	wc\
 	zombie
 

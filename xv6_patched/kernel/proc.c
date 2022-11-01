@@ -5,6 +5,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "pstat.h"
 
 struct {
   struct spinlock lock;
@@ -45,6 +46,11 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  // Added Variables
+  p->numTicks = 0;
+  p->numTickets = 10;
+  p->passvalue = 0;
+  p->stride = 10000/p->numTickets;
   release(&ptable.lock);
 
   // Allocate kernel stack if possible.
@@ -153,6 +159,15 @@ fork(void)
       np->ofile[i] = filedup(proc->ofile[i]);
   np->cwd = idup(proc->cwd);
  
+  ////your code here///// 
+  ////children inheritance the tickets from their parents//////
+  // proc is current process (i.e. parent)
+  ///np->number of tickets  = something like the parent -> number of tickets
+  ///get the exact the name fo number of tickets from proc.h the parent from the previous comment or some lines above
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
+
+  np->numTickets = proc->numTickets;
+ 
   pid = np->pid;
   np->state = RUNNABLE;
   safestrcpy(np->name, proc->name, sizeof(proc->name));
@@ -245,6 +260,13 @@ wait(void)
   }
 }
 
+
+
+
+
+
+
+
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
 // Scheduler never returns.  It loops, doing:
@@ -256,23 +278,41 @@ void
 scheduler(void)
 {
   struct proc *p;
+  struct proc *p1;
+  struct proc *pmin;
 
-  for(;;){
+  for(;;)
+  {
     // Enable interrupts on this processor.
+    
     sti();
-
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    {
       if(p->state != RUNNABLE)
+      {
         continue;
+      }
+      pmin = p;
+      for(p1 = ptable.proc; p1 < &ptable.proc[NPROC]; p1++)
+      {
+        if(p1->state == RUNNABLE && pmin->passvalue > p1->passvalue)
+        {
+          pmin = p1;
+          continue;
+        }
+      }
 
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
-      proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
+      proc = pmin;
+      
+      proc->passvalue = proc->passvalue + proc->stride;
+      switchuvm(pmin);
+      proc->numTicks++;
+      pmin->state = RUNNING;
       swtch(&cpu->scheduler, proc->context);
       switchkvm();
 
@@ -281,8 +321,57 @@ scheduler(void)
       proc = 0;
     }
     release(&ptable.lock);
-
   }
+}
+
+/////////////// your code here  first system call //////////////////////////////////
+////Assign the tickets passed by the user to variable number of tickets of the process, 
+///check the name of this variable in proc.h
+///////////////////////////////////////////////////////////////////////////////////////
+int settickets(int num)
+{
+  if(num != 0)
+  {
+    proc->numTickets = num;
+  proc->stride = 10000/num;
+  }
+  return 0;
+}
+////////////////////////////////////////////////////////////////
+
+
+
+/////////////// your code here  second system call //////////////////////////////////////////////////////
+////fill the arrays of the pstat data structure with the information of the process 
+///check the name of this variable in proc.h
+///check the name of arrays of the LaTable in pstat, and the names of the varibles of the process in proc.h
+//READ THE ELEMENTS OF PSTAT IN THE DESCRIPTION OF THE PROJECT TO MAKE SENSE OF THISsaveInfo(
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int getpinfo(struct pstat* LaTable)  //create a pointer able to point to object of the tpe pstat
+{
+	struct proc *p;   //Create a pointer able to point to objects of the type proc (process) 
+	int i = 0; // used to iterate througt the slots of the arrays in pstat
+	acquire(&ptable.lock);  //lock the ptable (array containing the process) 
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){  // use p to iterate throght the ptable 
+		if(p->state == ZOMBIE || p->state == EMBRYO){  //check the state of a process, if it is different of ZOMBY and EMBRIO 
+			continue;
+		}
+		if(p->state == UNUSED){
+			LaTable->inuse[i] = 0;  //check the name of the arrays in pstat. 
+		}
+		else{
+			LaTable->inuse[i] = 1; 
+		}
+		LaTable->pid[i] = p->pid; //with the pid of the process p->
+		LaTable->tickets[i] = p->numTickets; //with the number of ti
+		LaTable->ticks[i] = p->numTicks; //with the number of time the process has runned in the cpu
+  	LaTable->passvalue[i] = p->passvalue;
+    LaTable->stride[i] = p->stride;
+    i++;
+	}
+	release(&ptable.lock);
+	return 0;	
 }
 
 // Enter scheduler.  Must hold only ptable.lock

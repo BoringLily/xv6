@@ -26,5 +26,7 @@ int sys_uptime(void);
 int sys_FirstPart(void);
 int sys_SecondPart(void);
 int sys_sct(void);
+int sys_getpinfo(void);
+int sys_settickets(void);
 
 #endif // _SYSFUNC_H_

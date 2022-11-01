@@ -1,5 +1,6 @@
 #ifndef _USER_H_
 #define _USER_H_
+#include "pstat.h"
 
 // Unicode Color Codes
 #define RED "\x1b[31m"
@@ -9,6 +10,7 @@
 #define MAGENTA "\x1b[35m"
 #define CYAN "\x1b[36m"
 #define RESET "\x1b[0m"
+#define WHITE "\e[0;37m"
 
 
 struct stat;
@@ -38,6 +40,8 @@ int uptime(void);
 int FirstPart(void);
 int SecondPart(void);
 int sct(int);
+int getpinfo(struct pstat*);
+int settickets(int);
 
 // user library functions (ulib.c)
 int stat(char*, struct stat*);
